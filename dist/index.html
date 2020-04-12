@@ -1,10 +1,32 @@
-<html>
-  <head>
-    <title>three-vrm test</title>
-    <link rel="stylesheet" href="index.css">
-    <script src="./main.js"></script>
-  </head>
-  <body>
+<!DOCTYPE html>
+<html lang="jp">
 
-  </body>
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="mobile-web-app-capable" content="yes">
+	<title>ThreeVR</title>
+	<link rel="stylesheet" href="./css/style.css">
+</head>
+
+<body>
+	<div id="title">
+		<h1>Akatsuki's ThreeVR</h1>
+		<input id="check" type="button" value="start" onclick="check()" disabled>
+		<p>
+			<div id="txt"></div>
+		</p>
+		<p>
+			詳細<br>
+			<span id="test"></span>
+		</p>
+		<p>
+			<a href="http://twitter.com/nomber1910">twitter</a>
+		</p>
+	</div>
+	<div id="pixiview" class="canvas-wrapper"><canvas></canvas></div>
+	<script src="main.js"></script>
+</body>
+
 </html>

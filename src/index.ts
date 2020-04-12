@@ -7,8 +7,12 @@ import {
     VRMSchema
 } from '@pixiv/three-vrm'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+import { DeviceOrientationControls } from "three/examples/jsm/controls/DeviceOrientationControls"
+import Stats from 'stats.js';
+import * as nipplejs from 'nipplejs'
+import * as PIXI from 'pixi.js'
 
-import {bonevpd} from "./pose";
+// import {bonevpd} from "./pose";
 
 function returnBone(vrm:any,boneSt:String){
     let bone;
@@ -72,7 +76,121 @@ function returnBone(vrm:any,boneSt:String){
     return vrm.humanoid!.getBoneNode(bone) !;
 }
 
-window.addEventListener("DOMContentLoaded", () => {
+var ua = [
+	"iPod",
+	"iPad",
+	"iPhone"
+];
+
+function success() {
+	(document.getElementById("txt") as HTMLElement).innerHTML = "ボタンを押してください!";
+	(document.getElementById("check") as HTMLInputElement).disabled = false;
+}
+
+function failure() {
+	(document.getElementById("txt") as HTMLElement).innerHTML = "このデバイスでは対応しておりません";
+}
+
+
+(document.getElementById("test") as HTMLElement).innerHTML = window.navigator.userAgent;
+var iosflg = false;
+if (((window.DeviceOrientationEvent) && ('ontouchstart' in window))) {
+	//mobile
+	for (var i = 0; i < ua.length; i++) {
+		if (window.navigator.userAgent.indexOf(ua[i]) > 0) {
+			iosflg = true;
+			success();
+			break;
+		}
+	}
+
+	if (!iosflg && window.navigator.userAgent.indexOf("Android") > 0) {
+		success();
+	}
+
+} else {
+	//pc
+	failure();
+}
+
+function check() {
+	(document.getElementById("check") as HTMLInputElement).disabled = true;
+	if (iosflg) {
+		//ios
+		try {
+			DeviceOrientationEvent.requestPermission().then(res => {
+				//yes
+				if (res === 'granted') {
+					main();
+					//no
+				} else {
+					failure();
+				}
+			});
+		} catch (e) {
+			failure();
+			alert(e);
+		}
+	} else {
+		//android
+		main();
+	}
+}
+
+(document.getElementById("check") as HTMLInputElement).onclick = check;
+
+var manager = nipplejs.create({
+	zone: document.getElementById('pixiview')!,
+	catchDistance: 150,
+	color: 'white'
+});
+
+manager.on("move",(e,n)=>{
+	console.log(n.angle.degree);
+});
+
+function main(){
+    (document.getElementById("pixiview") as HTMLElement).style.display = "inline";
+	(document.getElementById("title") as HTMLElement).style.display = "none";
+	// document.body.requestFullscreen();//ios非対応
+
+	window.resizeTo(window.innerWidth, window.innerHeight);
+	var width = window.innerWidth;
+	var height = window.innerHeight;
+
+    const stats = new Stats();
+    stats.showPanel(0);
+    document.body.appendChild(stats.dom);
+
+	var stage = new PIXI.Container();
+	var renderer = PIXI.autoDetectRenderer({
+		width: width,
+		height: height,
+		resolution: 1,
+		antialias: true,
+		transparent: true
+	});
+	(document.getElementById("pixiview") as HTMLElement).appendChild(renderer.view);
+
+	var word = "";
+	var style = {
+		fontFamily: 'Arial',
+		fontSize: '40px',
+		fill: 'white',
+		fontWeight: "bold"
+	};
+	var obj = new PIXI.Text(word, style);
+	obj.position.x = width / 2;
+	obj.position.y = height / 2;
+	obj.anchor.x = 0.5;
+	obj.anchor.y = 0.5;
+	stage.addChild(obj);
+	manager.on("move",(e,n)=>{
+        var num = Math.floor(n.angle.degree * 1000)/1000;
+		obj.text=String(num);
+	});
+
+    //three
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(
         45,
@@ -86,28 +204,48 @@ window.addEventListener("DOMContentLoaded", () => {
     const axes = new THREE.AxesHelper(1000);
     scene.add(axes);
 
-    const renderer = new THREE.WebGLRenderer({
+    const rendererThree = new THREE.WebGLRenderer({
+        canvas: (document.querySelector('canvas') as HTMLCanvasElement),
         antialias: true
     });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000);
-    document.body.appendChild(renderer.domElement);
+    rendererThree.setPixelRatio(window.devicePixelRatio);
+	rendererThree.setSize(width, height);
+    rendererThree.setClearColor(0x000000);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.y=cameraY;
+    const controls = new DeviceOrientationControls(camera);
+	controls.connect();
+	// const controls2 = new THREE.OrbitControls(camera, rendererThree.domElement);//pc用
+	// controls2.enableDamping = true;
 
     const light = new THREE.DirectionalLight(0xffffff);
     light.position.set(1, 1, 1).normalize();
     scene.add(light);
 
+    let geometry = new THREE.SphereGeometry(10);
+	let material = new THREE.MeshBasicMaterial({
+        vertexColors: THREE.FaceColors as any
+	});
+	for (let l = 0; l < geometry.faces.length; l++) {
+		geometry.faces[l].color.set(Math.random() * 0xCC0000);
+	}
+
+	let box:any[] = [];
+	let num = 4000;
+
+	for (var i = 0; i < 5000; i++) {
+		box[i] = new THREE.Mesh(geometry, material);
+		box[i].position.set((Math.random() * num) - num / 2, (Math.random() * num) - num / 2, (Math.random() * num) - num / 2);
+		scene.add(box[i]);
+	}
+
     let vrmupdate:any;
 
     const loader = new GLTFLoader();
 
-    const a = 10;
+    const a = 100;
 
     loader.load(
-        './models/Lefm.vrm',
+        './models/test.vrm',
 
         (gltf) => {
             VRM.from(gltf).then((vrm) => {
@@ -117,12 +255,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
                 // bonevpd(vrm,VRMSchema);
 
-                console.log(returnBone(vrm,"LeftFoot").position);
-                returnBone(vrm,"LeftFoot").position.x-=1.150000/a;
-                returnBone(vrm,"LeftFoot").position.y+=7.185793/a;
-                returnBone(vrm,"LeftFoot").position.z+=0.574168/a;
-                returnBone(vrm,"LeftFoot").rotation.x=-0.844162-Math.PI/2;
-                console.log(returnBone(vrm,"LeftFoot").position);
+                // returnBone(vrm,"LeftFoot").position.x-=1.150000/a;
 
             })
         }
@@ -130,8 +263,14 @@ window.addEventListener("DOMContentLoaded", () => {
 
     const update = () => {
         requestAnimationFrame(update);
+        stats.begin();
+        for (var i = 0; i < box.length; i++) {
+			box[i].rotation.y += 0.1;
+		}
+        stats.end();
         controls.update();
-        renderer.render(scene, camera);
+        renderer.render(stage);
+        rendererThree.render(scene, camera);
     };
     update();
-})
+}
