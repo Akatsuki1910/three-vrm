@@ -76,7 +76,7 @@ function returnBone(vrm:any,boneSt:String){
 	return vrm.humanoid!.getBoneNode(bone) !;
 }
 
-var ua = [
+const ua:string[] = [
 	"iPod",
 	"iPad",
 	"iPhone"
@@ -93,10 +93,10 @@ function failure() {
 
 
 (document.getElementById("test") as HTMLElement).innerHTML = window.navigator.userAgent;
-var iosflg = false;
+let iosflg:boolean = false;
 if (((window.DeviceOrientationEvent) && ('ontouchstart' in window))) {
 	//mobile
-	for (var i = 0; i < ua.length; i++) {
+	for (let i:number = 0; i < ua.length; i++) {
 		if (window.navigator.userAgent.indexOf(ua[i]) > 0) {
 			iosflg = true;
 			success();
@@ -139,31 +139,36 @@ function check() {
 
 (document.getElementById("check") as HTMLInputElement).onclick = check;
 
-var manager = nipplejs.create({
-	zone: document.getElementById("pixiview") as HTMLElement,
-	catchDistance: 150,
+const xzManager = nipplejs.create({
+	zone: document.getElementById("xzBox") as HTMLElement,
+	// mode: 'static',
+	// position: {left: '50%', top: '50%'},
 	color: 'white'
 });
 
-manager.on("move",(e,n)=>{
-	console.log(n.angle.degree);
+const yManager = nipplejs.create({
+	zone: document.getElementById("yBox") as HTMLElement,
+	// mode: 'static',
+	// position: {left: '50%', top: '50%'},
+	color: 'red',
+	lockY:true
 });
 
 function main(){
-    (document.getElementById("pixiview") as HTMLElement).style.display = "inline";
+	(document.getElementById("canvas-wrapper-main") as HTMLElement).style.display = "inline";
 	(document.getElementById("title") as HTMLElement).style.display = "none";
 	// document.body.requestFullscreen();//ios非対応
 
 	window.resizeTo(window.innerWidth, window.innerHeight);
-	var width = window.innerWidth;
-	var height = window.innerHeight;
+	const width:number = window.innerWidth;
+	const height:number = window.innerHeight;
 
-    const stats = new Stats();
-    stats.showPanel(0);
-    document.body.appendChild(stats.dom);
+	const stats = new Stats();
+	stats.showPanel(0);
+	document.body.appendChild(stats.dom);
 
-	var stage = new PIXI.Container();
-	var renderer = PIXI.autoDetectRenderer({
+	const stage = new PIXI.Container();
+	const renderer = PIXI.autoDetectRenderer({
 		width: width,
 		height: height,
 		resolution: 1,
@@ -172,22 +177,33 @@ function main(){
 	});
 	(document.getElementById("pixiview") as HTMLElement).appendChild(renderer.view);
 
-	var word = "";
-	var style = {
-		fontFamily: 'Arial',
-		fontSize: '40px',
-		fill: 'white',
-		fontWeight: "bold"
-	};
-	var obj = new PIXI.Text(word, style);
-	obj.position.x = width / 2;
-	obj.position.y = height / 2;
-	obj.anchor.x = 0.5;
-	obj.anchor.y = 0.5;
-	stage.addChild(obj);
-	manager.on("move",(e,n)=>{
-    var num = Math.floor(n.angle.degree * 1000)/1000;
-		obj.text=String(num);
+	//xz軸
+	xzManager.on("move",(e,n)=>{
+		let deg_see:number = n.angle.degree;
+		if(deg_see<=270){
+			deg_see-=90;
+		}else{
+			deg_see-=360+90;
+		}
+		deg_see = Math.floor(deg_see * 1000)/1000;//小数3桁まで
+
+		let deg_move:number = (camera.rotation.y * 180 / Math.PI) + deg_see;
+		if(deg_move<-90){
+			deg_move+=360+90;
+		}else{
+			deg_move+=90;
+		}
+		camera.position.x += Math.cos(deg_move*(Math.PI / 180)) * 0.01;
+		camera.position.z -= Math.sin(deg_move*(Math.PI / 180)) * 0.01;
+	});
+
+	//y軸
+	yManager.on("move",(e,n)=>{
+		if(n.direction!=undefined){
+			const force:number = n.force;
+			const p:number = (n.direction.y=="up")?1:-1;
+			camera.position.y += force * 0.01 * p;
+		}
 	});
 
 	//three
@@ -198,11 +214,17 @@ function main(){
 		0.1,
 		1000
 	);
-	const cameraY = 0.8;
+	const cameraY:number = 0.8;
 	camera.position.set(0, cameraY, 2);
 
-	const axes = new THREE.AxesHelper(1000);
-	scene.add(axes);
+	const controls = new DeviceOrientationControls(camera);
+	controls.connect();
+
+	// const controls2 = new THREE.OrbitControls(camera, rendererThree.domElement);//pc用
+	// controls2.enableDamping = true;
+
+	// const axes = new THREE.AxesHelper(1000);//デバッグ
+	// scene.add(axes);
 
 	const rendererThree = new THREE.WebGLRenderer({
 		canvas: (document.querySelector('canvas') as HTMLCanvasElement),
@@ -212,11 +234,6 @@ function main(){
 	rendererThree.setSize(width, height);
 	rendererThree.setClearColor(0x000000);
 
-	const controls = new DeviceOrientationControls(camera);
-	controls.connect();
-	// const controls2 = new THREE.OrbitControls(camera, rendererThree.domElement);//pc用
-	// controls2.enableDamping = true;
-
 	const light = new THREE.DirectionalLight(0xffffff);
 	light.position.set(1, 1, 1).normalize();
 	scene.add(light);
@@ -225,14 +242,14 @@ function main(){
 	let material = new THREE.MeshBasicMaterial({
 		vertexColors: THREE.FaceColors as any
 	});
-	for (let l = 0; l < geometry.faces.length; l++) {
+	for (let l:number = 0; l < geometry.faces.length; l++) {
 		geometry.faces[l].color.set(Math.random() * 0xCC0000);
 	}
 
 	let box:any[] = [];
-	let num = 4000;
+	let num:number = 4000;
 
-	for (var i = 0; i < 5000; i++) {
+	for (let i:number = 0; i < 5000; i++) {
 		box[i] = new THREE.Mesh(geometry, material);
 		box[i].position.set((Math.random() * num) - num / 2, (Math.random() * num) - num / 2, (Math.random() * num) - num / 2);
 		scene.add(box[i]);
@@ -242,7 +259,7 @@ function main(){
 
 	const loader = new GLTFLoader();
 
-	const a = 100;
+	// const a:number = 100;
 
 	loader.load(
 		'./models/test.vrm',
@@ -260,13 +277,26 @@ function main(){
 		}
 	)
 
+	// window.addEventListener("deviceorientation", handleOrientation, true);//デバッグ
+	// function handleOrientation(event:any) {
+	// 	const absolute:number = event.absolute;
+	// 	const alpha:number    = event.alpha;
+	// 	const beta:number     = event.beta;
+	// 	const gamma:number    = event.gamma;
+	// 	console.log(alpha,beta,gamma);
+	// }
+
 	const update = () => {
 		requestAnimationFrame(update);
 		stats.begin();
-		for (var i = 0; i < box.length; i++) {
+		for (let i:number = 0; i < box.length; i++) {
 			box[i].rotation.y += 0.1;
 		}
 		stats.end();
+		//初期カメラ調整
+		if(controls.alphaOffset==0 && camera.rotation.y!=0){
+			controls.alphaOffset = camera.rotation.y * -1;
+		}
 		controls.update();
 		renderer.render(stage);
 		rendererThree.render(scene, camera);

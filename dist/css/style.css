@@ -8,13 +8,36 @@ body {
   text-align: center;
 }
 
+.canvas-wrapper-main {
+  display: none;
+}
+
 .canvas-wrapper {
   position: relative;
-  display: none;
 }
 
 .canvas-wrapper canvas {
   position: absolute;
   top: 0;
   left: 0;
+}
+
+.nipple {
+  position: relative;
+  display: inline;
+}
+
+.nipple .xz-box {
+  position: absolute;
+  width: 50vmin;
+  height: 50vmin;
+  top: calc(100vmax - 50vmin);
+}
+
+.nipple .y-box {
+  position: absolute;
+  width: 50vmin;
+  height: 50vmin;
+  top: calc(100vmax - 50vmin);
+  left: 50vmin;
 }
