@@ -4,4 +4,5 @@ node_modules/
 .yo-rc.json
 package-lock.json
 yarn.lock
+yarn-error.log
 dist/index.css.map
