@@ -1,285 +1,227 @@
 import * as THREE from 'three'
 import {
-    GLTFLoader
+	GLTFLoader
 } from 'three/examples/jsm/loaders/GLTFLoader'
 import {
-    VRM,
-    VRMSchema
+	VRM,
+	VRMSchema
 } from '@pixiv/three-vrm'
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
+import {
+	OrbitControls
+} from "three/examples/jsm/controls/OrbitControls"
 
-function returnBone(vrm:any,boneSt:String){
-    let bone;
-    switch(boneSt){
-        case "Chest": bone = VRMSchema.HumanoidBoneName.Chest; break;
-        case "Head": bone = VRMSchema.HumanoidBoneName.Head; break;
-        case "Hips": bone = VRMSchema.HumanoidBoneName.Hips; break;
-        case "Jaw": bone = VRMSchema.HumanoidBoneName.Jaw; break;
-        case "LeftEye": bone = VRMSchema.HumanoidBoneName.LeftEye; break;
-        case "LeftFoot": bone = VRMSchema.HumanoidBoneName.LeftFoot; break;
-        case "LeftHand": bone = VRMSchema.HumanoidBoneName.LeftHand; break;
-        case "LeftIndexDistal": bone = VRMSchema.HumanoidBoneName.LeftIndexDistal; break;
-        case "LeftIndexIntermediate": bone = VRMSchema.HumanoidBoneName.LeftIndexIntermediate; break;
-        case "LeftIndexProximal": bone = VRMSchema.HumanoidBoneName.LeftIndexProximal; break;
-        case "LeftLittleDistal": bone = VRMSchema.HumanoidBoneName.LeftLittleDistal; break;
-        case "LeftLittleIntermediate": bone = VRMSchema.HumanoidBoneName.LeftLittleIntermediate; break;
-        case "LeftLittleProximal": bone = VRMSchema.HumanoidBoneName.LeftLittleProximal; break;
-        case "LeftLowerArm": bone = VRMSchema.HumanoidBoneName.LeftLowerArm; break;
-        case "LeftLowerLeg": bone = VRMSchema.HumanoidBoneName.LeftLowerLeg; break;
-        case "LeftMiddleDistal": bone = VRMSchema.HumanoidBoneName.LeftMiddleDistal; break;
-        case "LeftMiddleIntermediate": bone = VRMSchema.HumanoidBoneName.LeftMiddleIntermediate; break;
-        case "LeftMiddleProximal": bone = VRMSchema.HumanoidBoneName.LeftMiddleProximal; break;
-        case "LeftRingDistal": bone = VRMSchema.HumanoidBoneName.LeftRingDistal; break;
-        case "LeftRingIntermediate": bone = VRMSchema.HumanoidBoneName.LeftRingIntermediate; break;
-        case "LeftRingProximal": bone = VRMSchema.HumanoidBoneName.LeftRingProximal; break;
-        case "LeftShoulder": bone = VRMSchema.HumanoidBoneName.LeftShoulder; break;
-        case "LeftThumbDistal": bone = VRMSchema.HumanoidBoneName.LeftThumbDistal; break;
-        case "LeftThumbIntermediate": bone = VRMSchema.HumanoidBoneName.LeftThumbIntermediate; break;
-        case "LeftThumbProximal": bone = VRMSchema.HumanoidBoneName.LeftThumbProximal; break;
-        case "LeftToes": bone = VRMSchema.HumanoidBoneName.LeftToes; break;
-        case "LeftUpperArm": bone = VRMSchema.HumanoidBoneName.LeftUpperArm; break;
-        case "LeftUpperLeg": bone = VRMSchema.HumanoidBoneName.LeftUpperLeg; break;
-        case "Neck": bone = VRMSchema.HumanoidBoneName.Neck; break;
-        case "RightEye": bone = VRMSchema.HumanoidBoneName.RightEye; break;
-        case "RightFoot": bone = VRMSchema.HumanoidBoneName.RightFoot; break;
-        case "RightHand": bone = VRMSchema.HumanoidBoneName.RightHand; break;
-        case "RightIndexDistal": bone = VRMSchema.HumanoidBoneName.RightIndexDistal; break;
-        case "RightIndexIntermediate": bone = VRMSchema.HumanoidBoneName.RightIndexIntermediate; break;
-        case "RightIndexProximal": bone = VRMSchema.HumanoidBoneName.RightIndexProximal; break;
-        case "RightLittleDistal": bone = VRMSchema.HumanoidBoneName.RightLittleDistal; break;
-        case "RightLittleIntermediate": bone = VRMSchema.HumanoidBoneName.RightLittleIntermediate; break;
-        case "RightLittleProximal": bone = VRMSchema.HumanoidBoneName.RightLittleProximal; break;
-        case "RightLowerArm": bone = VRMSchema.HumanoidBoneName.RightLowerArm; break;
-        case "RightLowerLeg": bone = VRMSchema.HumanoidBoneName.RightLowerLeg; break;
-        case "RightMiddleDistal": bone = VRMSchema.HumanoidBoneName.RightMiddleDistal; break;
-        case "RightMiddleIntermediate": bone = VRMSchema.HumanoidBoneName.RightMiddleIntermediate; break;
-        case "RightMiddleProximal": bone = VRMSchema.HumanoidBoneName.RightMiddleProximal; break;
-        case "RightRingDistal": bone = VRMSchema.HumanoidBoneName.RightRingDistal; break;
-        case "RightRingIntermediate": bone = VRMSchema.HumanoidBoneName.RightRingIntermediate; break;
-        case "RightRingProximal": bone = VRMSchema.HumanoidBoneName.RightRingProximal; break;
-        case "RightShoulder": bone = VRMSchema.HumanoidBoneName.RightShoulder; break;
-        case "RightThumbDistal": bone = VRMSchema.HumanoidBoneName.RightThumbDistal; break;
-        case "RightThumbIntermediate": bone = VRMSchema.HumanoidBoneName.RightThumbIntermediate; break;
-        case "RightThumbProximal": bone = VRMSchema.HumanoidBoneName.RightThumbProximal; break;
-        case "RightToes": bone = VRMSchema.HumanoidBoneName.RightToes; break;
-        case "RightUpperArm": bone = VRMSchema.HumanoidBoneName.RightUpperArm; break;
-        case "RightUpperLeg": bone = VRMSchema.HumanoidBoneName.RightUpperLeg; break;
-        case "Spine": bone = VRMSchema.HumanoidBoneName.Spine; break;
-        case "UpperChest": bone = VRMSchema.HumanoidBoneName.UpperChest; break;
-    }
-    return vrm.humanoid!.getBoneNode(bone) !;
+import {
+	bonevpd
+} from "./pose";
+import {
+	Vector3
+} from 'three';
+import {
+	IK,
+	IKChain,
+	IKJoint,
+	IKBallConstraint,
+	IKHelper
+} from 'three-ik';
+
+const H_boneName = VRMSchema.HumanoidBoneName;
+const H_bone = [
+	["Chest", H_boneName.Chest],
+	["Head", H_boneName.Head],
+	["Hips", H_boneName.Hips],
+	["Jaw", H_boneName.Jaw],
+	["LeftEye", H_boneName.LeftEye],
+	["LeftFoot", H_boneName.LeftFoot],
+	["LeftHand", H_boneName.LeftHand],
+	["LeftIndexDistal", H_boneName.LeftIndexDistal],
+	["LeftIndexIntermediate", H_boneName.LeftIndexIntermediate],
+	["LeftIndexProximal", H_boneName.LeftIndexProximal],
+	["LeftLittleDistal", H_boneName.LeftLittleDistal],
+	["LeftLittleIntermediate", H_boneName.LeftLittleIntermediate],
+	["LeftLittleProximal", H_boneName.LeftLittleProximal],
+	["LeftLowerArm", H_boneName.LeftLowerArm],
+	["LeftLowerLeg", H_boneName.LeftLowerLeg],
+	["LeftMiddleDistal", H_boneName.LeftMiddleDistal],
+	["LeftMiddleIntermediate", H_boneName.LeftMiddleIntermediate],
+	["LeftMiddleProximal", H_boneName.LeftMiddleProximal],
+	["LeftRingDistal", H_boneName.LeftRingDistal],
+	["LeftRingIntermediate", H_boneName.LeftRingIntermediate],
+	["LeftRingProximal", H_boneName.LeftRingProximal],
+	["LeftShoulder", H_boneName.LeftShoulder],
+	["LeftThumbDistal", H_boneName.LeftThumbDistal],
+	["LeftThumbIntermediate", H_boneName.LeftThumbIntermediate],
+	["LeftThumbProximal", H_boneName.LeftThumbProximal],
+	["LeftToes", H_boneName.LeftToes],
+	["LeftUpperArm", H_boneName.LeftUpperArm],
+	["LeftUpperLeg", H_boneName.LeftUpperLeg],
+	["Neck", H_boneName.Neck],
+	["RightEye", H_boneName.RightEye],
+	["RightFoot", H_boneName.RightFoot],
+	["RightHand", H_boneName.RightHand],
+	["RightIndexDistal", H_boneName.RightIndexDistal],
+	["RightIndexIntermediate", H_boneName.RightIndexIntermediate],
+	["RightIndexProximal", H_boneName.RightIndexProximal],
+	["RightLittleDistal", H_boneName.RightLittleDistal],
+	["RightLittleIntermediate", H_boneName.RightLittleIntermediate],
+	["RightLittleProximal", H_boneName.RightLittleProximal],
+	["RightLowerArm", H_boneName.RightLowerArm],
+	["RightLowerLeg", H_boneName.RightLowerLeg],
+	["RightMiddleDistal", H_boneName.RightMiddleDistal],
+	["RightMiddleIntermediate", H_boneName.RightMiddleIntermediate],
+	["RightMiddleProximal", H_boneName.RightMiddleProximal],
+	["RightRingDistal", H_boneName.RightRingDistal],
+	["RightRingIntermediate", H_boneName.RightRingIntermediate],
+	["RightRingProximal", H_boneName.RightRingProximal],
+	["RightShoulder", H_boneName.RightShoulder],
+	["RightThumbDistal", H_boneName.RightThumbDistal],
+	["RightThumbIntermediate", H_boneName.RightThumbIntermediate],
+	["RightThumbProximal", H_boneName.RightThumbProximal],
+	["RightToes", H_boneName.RightToes],
+	["RightUpperArm", H_boneName.RightUpperArm],
+	["RightUpperLeg", H_boneName.RightUpperLeg],
+	["Spine", H_boneName.Spine],
+	["UpperChest", H_boneName.UpperChest],
+]
+
+const FingerNum = ["Proximal", "Intermediate", "Distal"];
+
+function returnBoneH(vrm: any, boneSt: string) {
+	let p = new RegExp(boneSt);
+	for (let name of H_bone) {
+		if (name[0].match(p)) {
+			return vrm.humanoid!.getBoneNode(name[1]) !;
+		}
+	}
 }
 
-function TransRoteChange(a:number){
-    if(Math.abs(a)<=0.0001){
-        return 0.000000;
-    }else{
-        return a/Math.sqrt(2*a);
-    }
+function returnBonePositionH(vrm: any, boneSt: string): Vector3 {
+	const rBH = returnBoneH(vrm, boneSt).matrixWorld;
+	return new THREE.Vector3(rBH.elements[12], rBH.elements[13], rBH.elements[14]);
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(
-        45,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
-    );
-    const cameraY = 0.8;
-    camera.position.set(0, cameraY, 2);
+	const scene = new THREE.Scene();
+	const camera = new THREE.PerspectiveCamera(
+		45,
+		window.innerWidth / window.innerHeight,
+		0.1,
+		1000
+	);
+	const cameraY = 0.8;
+	camera.position.set(0, cameraY, -2);
 
-    const renderer = new THREE.WebGLRenderer({
-        antialias: true
-    });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor(0x000000);
-    document.body.appendChild(renderer.domElement);
+	const axes = new THREE.AxesHelper(1000);
+	scene.add(axes);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.y=cameraY;
+	const renderer = new THREE.WebGLRenderer({
+		antialias: true
+	});
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setClearColor(0x000000);
+	document.body.appendChild(renderer.domElement);
 
-    const light = new THREE.DirectionalLight(0xffffff);
-    light.position.set(1, 1, 1).normalize();
-    scene.add(light);
+	const controls = new OrbitControls(camera, renderer.domElement);
+	controls.target.y = cameraY;
 
-    let vrmupdate:any;
+	const light = new THREE.DirectionalLight(0xffffff);
+	light.position.set(1, 1, 1).normalize();
+	scene.add(light);
 
-    const loader = new GLTFLoader();
+	let vrmupdate: any;
 
-    const a = 200;
+	const loader = new GLTFLoader();
 
-    loader.load(
-        './models/test.vrm',
+	const a = 10;
 
-        (gltf) => {
-            VRM.from(gltf).then((vrm) => {
-                scene.add(vrm.scene);
-                vrm.scene.rotation.y = Math.PI;
-                vrmupdate = vrm;
-                // //左足IK
-                // returnBone(vrm,"LeftLowerLeg").position.x+=1.150000/a;
-                // // returnBone(vrm,"LeftLowerLeg").position.y+=7.1/a;
-                // returnBone(vrm,"LeftLowerLeg").position.z+=0.574168/a;
-                // returnBone(vrm,"LeftLowerLeg").rotation.x=-(0.844162+TransRoteChange(7.185793/10));
-                // //左足
-                // returnBone(vrm,"LeftUpperLeg").rotation.x=0.024375;
-                // returnBone(vrm,"LeftUpperLeg").rotation.y=-0.114538;
-                // returnBone(vrm,"LeftUpperLeg").rotation.z=0.120492;
-                //上半身
-                returnBone(vrm,"Chest").rotation.x=-0.154380;
-                //上半身2
-                returnBone(vrm,"Spine").rotation.x=-0.212484;
-                returnBone(vrm,"Spine").rotation.y=-0.019175;
-                returnBone(vrm,"Spine").rotation.z=0.087809;
-                //右肩
-                returnBone(vrm,"RightShoulder").rotation.x=0.072897;
-                returnBone(vrm,"RightShoulder").rotation.y=-0.061144;
-                returnBone(vrm,"RightShoulder").rotation.z=-0.452654+Math.PI/2;
-                //右腕
-                returnBone(vrm,"RightUpperArm").rotation.x=-0.000591;
-                returnBone(vrm,"RightUpperArm").rotation.y=-0.000405;
-                returnBone(vrm,"RightUpperArm").rotation.z=0.434965;
-                //右手捩
-                returnBone(vrm,"RightHand").rotation.x=-0.488669+Math.PI/2;
-                returnBone(vrm,"RightHand").rotation.y=-0.350198;
-                returnBone(vrm,"RightHand").rotation.z=0.001780;
+	const movingTarget1 = new THREE.Mesh(new THREE.SphereGeometry(0.1), new THREE.MeshBasicMaterial({
+		color: 0xff0000
+	}));
+	const movingTarget2 = new THREE.Mesh(new THREE.SphereGeometry(0.1), new THREE.MeshBasicMaterial({
+		color: 0x00ff00
+	}));
+	const movingTarget3 = new THREE.Mesh(new THREE.SphereGeometry(0.1), new THREE.MeshBasicMaterial({
+		color: 0x0000ff
+	}));
 
-                //左肩
-                returnBone(vrm,"LeftShoulder").rotation.x=0.093042;
-                returnBone(vrm,"LeftShoulder").rotation.y=-0.170585;
-                returnBone(vrm,"LeftShoulder").rotation.z=0.036446;
-                // //左腕
-                returnBone(vrm,"LeftUpperArm").rotation.x=-0.200913;
-                returnBone(vrm,"LeftUpperArm").rotation.y=-0.152795+Math.PI/4;
-                returnBone(vrm,"LeftUpperArm").rotation.z=-0.248597+Math.PI/2;
-                // //左ひじ
-                returnBone(vrm,"LeftLowerArm").rotation.x=0.697229;
-                returnBone(vrm,"LeftLowerArm").rotation.y=0.642157-Math.PI;
-                returnBone(vrm,"LeftLowerArm").rotation.z=0.049018;
-                // //左手捩
-                returnBone(vrm,"LeftHand").rotation.x=0.232429;
-                returnBone(vrm,"LeftHand").rotation.y=-0.166567;
-                returnBone(vrm,"LeftHand").rotation.z=0.000847;
-                //首
-                returnBone(vrm,"Neck").rotation.z=0.010000;
-                //頭
-                returnBone(vrm,"Head").rotation.x=0.089717;
-                returnBone(vrm,"Head").rotation.y=-0.005389;
-                returnBone(vrm,"Head").rotation.z=0.059721;
+	const ik = new IK();
+	const bones:any[] = [];
+	const chain = new IKChain();
+	const constraints = [new IKBallConstraint(270)];
+	const movingTarget = new THREE.Mesh(new THREE.SphereGeometry(0.1), new THREE.MeshBasicMaterial({
+		color: 0xffffff
+	}));
+	movingTarget.position.x = -1;
+	const pivot = new THREE.Object3D();
+	pivot.add(movingTarget);
+	scene.add(pivot);
 
-                //右親指1
-                returnBone(vrm,"RightThumbIntermediate").rotation.x=0.118556;
-                returnBone(vrm,"RightThumbIntermediate").rotation.y=-0.120695-Math.PI/4;
-                //右親指2
-                returnBone(vrm,"RightThumbDistal").rotation.x=0.077010;
-                returnBone(vrm,"RightThumbDistal").rotation.y=0.091654-Math.PI/4;
-                //右小指1
-                returnBone(vrm,"RightLittleProximal").rotation.x=-0.118397;
-                returnBone(vrm,"RightLittleProximal").rotation.y=-0.067940;
-                returnBone(vrm,"RightLittleProximal").rotation.z=-0.706264-Math.PI/8;
-                //右小指2
-                returnBone(vrm,"RightLittleIntermediate").rotation.y=-0.000001;
-                returnBone(vrm,"RightLittleIntermediate").rotation.z=-0.593177-Math.PI/4;
-                //右小指3
-                returnBone(vrm,"RightLittleDistal").rotation.x=-0.000001;
-                returnBone(vrm,"RightLittleDistal").rotation.z=-0.518418-Math.PI/8;
-                //右薬指1
-                returnBone(vrm,"RightRingProximal").rotation.x=-0.065159;
-                returnBone(vrm,"RightRingProximal").rotation.y=-0.048479;
-                returnBone(vrm,"RightRingProximal").rotation.z=-0.648399-Math.PI/8;
-                //右薬指2
-                returnBone(vrm,"RightRingIntermediate").rotation.y=-0.000001;
-                returnBone(vrm,"RightRingIntermediate").rotation.z=-0.597195-Math.PI/4;
-                //右薬指3
-                returnBone(vrm,"RightRingDistal").rotation.x=-0.000001;
-                returnBone(vrm,"RightRingDistal").rotation.z=-0.593177-Math.PI/8;
-                //右中指1
-                returnBone(vrm,"RightMiddleProximal").rotation.y=-0.000001;
-                returnBone(vrm,"RightMiddleProximal").rotation.z=-0.539632-Math.PI/8;
-                //右中指2
-                returnBone(vrm,"RightMiddleIntermediate").rotation.y=-0.000001;
-                returnBone(vrm,"RightMiddleIntermediate").rotation.z=-0.744643-Math.PI/4;
-                //右中指3
-                returnBone(vrm,"RightMiddleDistal").rotation.x=-0.000001;
-                returnBone(vrm,"RightMiddleDistal").rotation.z=-0.539631-Math.PI/8;
-                //右人差指1
-                returnBone(vrm,"RightIndexProximal").rotation.x=0.037964;
-                returnBone(vrm,"RightIndexProximal").rotation.y=0.052706;
-                returnBone(vrm,"RightIndexProximal").rotation.z=-0.313901-Math.PI/8;
-                //右人差指2
-                returnBone(vrm,"RightIndexIntermediate").rotation.x=-0.000002;
-                returnBone(vrm,"RightIndexIntermediate").rotation.y=-0.000001;
-                returnBone(vrm,"RightIndexIntermediate").rotation.z=-0.867422-Math.PI/8;
-                //右人差指3
-                returnBone(vrm,"RightIndexDistal").rotation.y=0.000001;
-                returnBone(vrm,"RightIndexDistal").rotation.z=-0.457338-Math.PI/4;
+	for (let i = 0; i < 3; i++) {
+		const bone = new THREE.Bone();
+		bone.position.z = i === 0 ? 1 : 1;
 
-                //左親指1
-                returnBone(vrm,"LeftThumbIntermediate").rotation.x=-0.118556;
-                returnBone(vrm,"LeftThumbIntermediate").rotation.y=-0.120695+Math.PI/4;
-                //右親指2
-                returnBone(vrm,"LeftThumbDistal").rotation.x=-0.077010;
-                returnBone(vrm,"LeftThumbDistal").rotation.y=-0.091654+Math.PI/4;
-                //右小指1
-                returnBone(vrm,"LeftLittleProximal").rotation.x=-0.118397;
-                returnBone(vrm,"LeftLittleProximal").rotation.y=0.067940;
-                returnBone(vrm,"LeftLittleProximal").rotation.z=0.706264+Math.PI/8;
-                //右小指2
-                returnBone(vrm,"LeftLittleIntermediate").rotation.y=0.000001;
-                returnBone(vrm,"LeftLittleIntermediate").rotation.z=0.593177+Math.PI/4;
-                //右小指3
-                returnBone(vrm,"LeftLittleDistal").rotation.x=0.000001;
-                returnBone(vrm,"LeftLittleDistal").rotation.z=0.518418+Math.PI/8;
-                //右薬指1
-                returnBone(vrm,"LeftRingProximal").rotation.x=0.065159;
-                returnBone(vrm,"LeftRingProximal").rotation.y=0.048479;
-                returnBone(vrm,"LeftRingProximal").rotation.z=0.648399+Math.PI/8;
-                //右薬指2
-                returnBone(vrm,"LeftRingIntermediate").rotation.y=0.000001;
-                returnBone(vrm,"LeftRingIntermediate").rotation.z=0.597195+Math.PI/4;
-                //右薬指3
-                returnBone(vrm,"LeftRingDistal").rotation.x=-0.000001;
-                returnBone(vrm,"LeftRingDistal").rotation.z=0.593177+Math.PI/8;
-                //右中指1
-                returnBone(vrm,"LeftMiddleProximal").rotation.y=0.000001;
-                returnBone(vrm,"LeftMiddleProximal").rotation.z=0.539632+Math.PI/8;
-                //右中指2
-                returnBone(vrm,"LeftMiddleIntermediate").rotation.y=0.000001;
-                returnBone(vrm,"LeftMiddleIntermediate").rotation.z=0.744643+Math.PI/4;
-                //右中指3
-                returnBone(vrm,"LeftMiddleDistal").rotation.x=0.000001;
-                returnBone(vrm,"LeftMiddleDistal").rotation.z=0.539631+Math.PI/8;
-                //右人差指1
-                returnBone(vrm,"LeftIndexProximal").rotation.x=0.037964;
-                returnBone(vrm,"LeftIndexProximal").rotation.y=-0.052706;
-                returnBone(vrm,"LeftIndexProximal").rotation.z=0.313901+Math.PI/8;
-                //右人差指2
-                returnBone(vrm,"LeftIndexIntermediate").rotation.x=-0.000002;
-                returnBone(vrm,"LeftIndexIntermediate").rotation.y=0.000001;
-                returnBone(vrm,"LeftIndexIntermediate").rotation.z=0.867422+Math.PI/8;
-                //右人差指3
-                returnBone(vrm,"LeftIndexDistal").rotation.y=-0.000001;
-                returnBone(vrm,"LeftIndexDistal").rotation.z=0.457338+Math.PI/4;
+		if (bones[i - 1]) {
+			bones[i - 1].add(bone);
+		}
+		bones.push(bone);
 
-                vrm.humanoid!.setPose(
-                    {[VRMSchema.HumanoidBoneName.LeftLowerLeg] : {
-                        rotation: [  -0.844162,0.000000,0.000000,0.536089 ],
-                        position: [  1.150000/a,7.185793/a,0.574168/a ]
-                    }}
-                );
-            })
-        }
-    )
+		const target = i === 2 ? movingTarget : null;
+		chain.add(new IKJoint(bone, {	constraints}), {	target});
+	}
+	ik.add(chain);
+	scene.add(ik.getRootBone());
+	const helper = new IKHelper(ik);
+	scene.add(helper);
 
-    const update = () => {
-        requestAnimationFrame(update);
-        // returnBone(vrmupdate,"RightThumbDistal").rotation.y-=0.01;
-        let x = returnBone(vrmupdate,"LeftUpperLeg").position.x-returnBone(vrmupdate,"LeftLowerLeg").position.x;
-        let y = returnBone(vrmupdate,"LeftUpperLeg").position.y-returnBone(vrmupdate,"LeftLowerLeg").position.y;
-        let z = returnBone(vrmupdate,"LeftUpperLeg").position.z-returnBone(vrmupdate,"LeftLowerLeg").position.z;
-        controls.update();
-        renderer.render(scene, camera);
-    };
-    update();
+	loader.load(
+		'./models/akatsuki1910.vrm',
+
+		(gltf) => {
+			VRM.from(gltf).then((vrm) => {
+				scene.add(vrm.scene);
+				// vrm.scene.rotation.y = Math.PI;
+				vrmupdate = vrm;
+
+				// bonevpd(vrm,VRMSchema);
+
+				// movingTarget1.position.set(returnBonePositionH(vrm, "LeftUpperLeg").x, returnBonePositionH(vrm, "LeftUpperLeg").y, returnBonePositionH(vrm, "LeftUpperLeg").z);
+				// scene.add(movingTarget1);
+				// movingTarget2.position.set(returnBonePositionH(vrm, "LeftLowerLeg").x, returnBonePositionH(vrm, "LeftLowerLeg").y, returnBonePositionH(vrm, "LeftLowerLeg").z);
+				// scene.add(movingTarget2);
+				// movingTarget3.position.set(returnBonePositionH(vrm, "LeftFoot").x, returnBonePositionH(vrm, "LeftFoot").y, returnBonePositionH(vrm, "LeftFoot").z);
+				// scene.add(movingTarget3);
+				bones[0].position.y = 1;
+				movingTarget.position.set(returnBonePositionH(vrm, "LeftFoot").x, returnBonePositionH(vrm, "LeftFoot").y, returnBonePositionH(vrm, "LeftFoot").z);
+
+				// scene.traverse(function(obj) {
+				// console.log(obj.name)
+				// if(obj.name == "J_Bip_L_UpperLeg"){
+				// console.log(obj)
+				// }
+				// });
+				// returnBone(vrm,"LeftFoot").position.x-=1.150000/a;
+				// returnBone(vrm,"LeftFoot").position.y+=7.185793/a;
+				// returnBone(vrm,"LeftFoot").position.z+=0.574168/a;
+				// returnBone(vrm,"LeftFoot").rotation.x=-0.844162-Math.PI/2;
+				// returnBone(vrm,"LeftLowerLeg").rotation.x-=20.150000/a;
+				// returnBone(vrm,"LeftUpperLeg").rotation.x+=10.150000/a;
+				// LeftLowerLeg
+				// LeftUpperLeg
+				// LeftToes
+				// LeftFoot
+
+
+			})
+		},
+		(progress) => console.log('Loading model...', 100.0 * (progress.loaded / progress.total), '%'),
+		(error) => console.error(error)
+	)
+
+	const update = () => {
+		requestAnimationFrame(update);
+		// movingTarget3.position.z +=0.01;
+		ik.solve();
+		controls.update();
+		renderer.render(scene, camera);
+	};
+	update();
 })
