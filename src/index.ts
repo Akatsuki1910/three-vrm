@@ -183,28 +183,24 @@ window.addEventListener("DOMContentLoaded", () => {
 					let constraints = (i==0)?[new IKBallConstraint(180)]:[new IKBallConstraint(0)];
 					chain.add(new IKJoint(bone, {constraints}), {target});
 				}
-				// bones[0].rotation.set(Math.PI/2,0,0)
-				// bones[1].rotation.set(Math.PI/2,0,0)
-				// bones[2].rotation.set(Math.PI/2,0,0)
-				console.log(bones[0].rotation);
 				ik.add(chain);
 				scene.add(ik.getRootBone());
 				const helper = new IKHelper(ik);
 				scene.add(helper);
-				// renderer.render(scene, camera);
-				for(let i=0;i<100000;i++){ik.solve();}
+				ik.add(chain);
+				ik.solve();
 
 				var px = bones[0].rotation.x;
 				var py = bones[0].rotation.y;
 				var pz = bones[0].rotation.z;
 				// movingTarget.position.x+=10;
 				renderer.render(scene, camera);
-				for(let i=0;i<100000;i++){ik.solve();}
+				ik.add(chain);
+				ik.solve();
 				renderer.render(scene, camera);
 				console.log(bones[0].quaternion)
 				console.log(bones[0].rotation)
 				returnBoneH(vrm,"LeftUpperLeg").rotation.set(bones[0].rotation.z-pz,bones[0].rotation.y-py,bones[0].rotation.x-px);
-				// returnBoneH(vrm,"LeftUpperLeg").rotation.set(bones[0].matrixWorld.elements[0],bones[0].matrixWorld.elements[5],bones[0].matrixWorld.elements[10])
 				// scene.traverse(function(obj) {
 				// 	console.log(obj.name)
 				// 	if(obj.name == "J_Bip_L_UpperLeg"){
@@ -231,15 +227,15 @@ window.addEventListener("DOMContentLoaded", () => {
 
 	const update = () => {
 		requestAnimationFrame(update);
-		// var px = bones[0].rotation.x;
-		// var py = bones[0].rotation.y;
-		// var pz = bones[0].rotation.z;
+		var px = bones[0].rotation.x;
+		var py = bones[0].rotation.y;
+		var pz = bones[0].rotation.z;
 		// movingTarget.position.x+=0.001;
-		// ik.solve();
+		ik.solve();
 		controls.update();
 		renderer.render(scene, camera);
-		// returnBoneH(vrmupdate,"LeftUpperLeg").rotation.x+=bones[0].rotation.z-pz;
-		// returnBoneH(vrmupdate,"LeftUpperLeg").rotation.y+=bones[0].rotation.x-px;
-		// returnBoneH(vrmupdate,"LeftUpperLeg").rotation.z+=bones[0].rotation.y-py;
+		returnBoneH(vrmupdate,"LeftUpperLeg").rotation.x+=bones[0].rotation.z-pz;
+		returnBoneH(vrmupdate,"LeftUpperLeg").rotation.y+=bones[0].rotation.x-px;
+		returnBoneH(vrmupdate,"LeftUpperLeg").rotation.z+=bones[0].rotation.y-py;
 	};
 })
