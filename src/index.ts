@@ -9,7 +9,6 @@ import {
 import {
 	OrbitControls
 } from "three/examples/jsm/controls/OrbitControls"
-
 import {
 	bonevpd
 } from "./pose";
@@ -180,15 +179,22 @@ window.addEventListener("DOMContentLoaded", () => {
 					if (bones[i - 1]) {bones[i - 1].add(bone);}
 					bones.push(bone);
 					const target = i === 2 ? movingTarget : null;
-					let constraints = (i==0)?[new IKBallConstraint(180)]:[new IKBallConstraint(0)];
+					let constraints = (i==0)?[new IKBallConstraint(270)]:[new IKBallConstraint(90)];
 					chain.add(new IKJoint(bone, {constraints}), {target});
 				}
 				ik.add(chain);
 				scene.add(ik.getRootBone());
 				const helper = new IKHelper(ik);
 				scene.add(helper);
-				ik.add(chain);
+				// ik.add(chain);
 				ik.solve();
+
+				// 手を上げさせてみる
+                returnBoneH(vrmupdate, "LeftUpperArm").rotation.x = 0.6;
+				returnBoneH(vrmupdate, "LeftLowerArm").rotation.x = 0.8;
+				returnBoneH(vrmupdate, "LeftLowerArm").rotation.y = -1.;
+				returnBoneH(vrmupdate, "LeftHand").rotation.y = -0.5;
+				returnBoneH(vrmupdate, "RightUpperArm").rotation.z = -1.3;
 
 				var px = bones[0].rotation.x;
 				var py = bones[0].rotation.y;
@@ -225,17 +231,48 @@ window.addEventListener("DOMContentLoaded", () => {
 		(error) => console.error(error)
 	)
 
+	var theta = 0.00;
+	var t = 0;
+
 	const update = () => {
 		requestAnimationFrame(update);
 		var px = bones[0].rotation.x;
 		var py = bones[0].rotation.y;
 		var pz = bones[0].rotation.z;
-		// movingTarget.position.x+=0.001;
+		var ppx = bones[1].rotation.x;
+		var ppy = bones[1].rotation.y;
+		var ppz = bones[1].rotation.z;
+		if( t % 10 == 0 ) {
+			console.log( bones[0] );
+			console.log("X0:" + px + "Y0:" + py + "Z0:" + pz);
+			console.log("X1:" +ppx + "Y1:" +ppy + "Z1:" +ppz);
+		}
+		movingTarget.position.x = bones[0].position.x;
+		// movingTarget.position.y = bones[0].position.y-2;
+		// movingTarget.position.z = bones[0].position.z;
+		// movingTarget.position.x = Math.sin(theta*7);
+		movingTarget.position.y = 0.5 + Math.sin(theta*7)/2;
+		movingTarget.position.z = Math.sin(theta*2)*0.6;
 		ik.solve();
+
+		// returnBoneH(vrmupdate,"LeftUpperLeg").rotation.x = Math.PI/3;
+		// returnBoneH(vrmupdate,"LeftUpperLeg").rotation.z = Math.PI/3;
+		// offset( -90',0,0 )
+		// legBone.X == IKBone.X
+		// legBone.Y == IKBone.Z
+		// legBone.Z == IKBone.Y
+		returnBoneH(vrmupdate,"LeftUpperLeg").rotation.x = bones[0].rotation.x - Math.PI/2;
+		// returnBoneH(vrmupdate,"LeftUpperLeg").rotation.y = bones[0].rotation.z;
+		returnBoneH(vrmupdate,"LeftUpperLeg").rotation.z = bones[0].rotation.y;
+		returnBoneH(vrmupdate,"LeftLowerLeg").rotation.x = -bones[1].rotation.x;
+		// returnBoneH(vrmupdate,"LeftUpperLeg").rotation.y = bones[0].rotation.z;
+		// returnBoneH(vrmupdate,"LeftLowerLeg").rotation.z = bones[1].rotation.y;
+
 		controls.update();
 		renderer.render(scene, camera);
-		returnBoneH(vrmupdate,"LeftUpperLeg").rotation.x+=bones[0].rotation.z-pz;
-		returnBoneH(vrmupdate,"LeftUpperLeg").rotation.y+=bones[0].rotation.x-px;
-		returnBoneH(vrmupdate,"LeftUpperLeg").rotation.z+=bones[0].rotation.y-py;
+
+		theta += 0.004;
+		t++;
+
 	};
 })
