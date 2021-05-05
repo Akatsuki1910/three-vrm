@@ -1,8 +1,8 @@
 node_modules/
-.jshintrc
-.babelrc
-.yo-rc.json
 package-lock.json
 yarn.lock
-yarn-error.log
-dist/index.css.map
+.parcel-cache
+dist/
+src/vmd
+src/ts/models/
+.idea
